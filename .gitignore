@@ -2,3 +2,4 @@ data/sample.csv
 data/bernoulli.csv
 data_run.log
 __pycache__/
+grid_run.log
