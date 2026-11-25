@@ -1,0 +1,51 @@
+      group  threshold     measure  estimate  lo95  hi95     n
+        all         30      hansen     0.159 0.155 0.164 20000
+        all         30         tmf     0.068 0.064 0.071 20000
+        all         30        both     0.046 0.043 0.049 20000
+        all         30    disagree     0.134 0.129 0.139 20000
+        all         30 hansen_only     0.113 0.109 0.118 20000
+        all         30    tmf_only     0.021 0.019 0.023 20000
+ industrial         30      hansen     0.152 0.146 0.157 15612
+ industrial         30         tmf     0.063 0.059 0.067 15612
+ industrial         30        both     0.044 0.041 0.047 15612
+ industrial         30    disagree     0.127 0.122 0.132 15612
+ industrial         30 hansen_only     0.108 0.103 0.113 15612
+ industrial         30    tmf_only     0.019 0.017 0.021 15612
+smallholder         30      hansen     0.188 0.176 0.199  4388
+smallholder         30         tmf     0.083 0.075 0.092  4388
+smallholder         30        both     0.055 0.048 0.062  4388
+smallholder         30    disagree     0.161 0.150 0.172  4388
+smallholder         30 hansen_only     0.133 0.123 0.142  4388
+smallholder         30    tmf_only     0.028 0.024 0.033  4388
+
+Sensitivity, Hansen tree cover threshold:
+group  threshold     measure  estimate  lo95  hi95     n
+  all         10      hansen     0.161 0.156 0.166 20000
+  all         10         tmf     0.068 0.064 0.071 20000
+  all         10        both     0.047 0.044 0.050 20000
+  all         10    disagree     0.136 0.131 0.140 20000
+  all         10 hansen_only     0.115 0.110 0.119 20000
+  all         10    tmf_only     0.021 0.019 0.023 20000
+  all         50      hansen     0.156 0.151 0.161 20000
+  all         50         tmf     0.068 0.064 0.071 20000
+  all         50        both     0.046 0.043 0.049 20000
+  all         50    disagree     0.131 0.126 0.135 20000
+  all         50 hansen_only     0.109 0.105 0.114 20000
+  all         50    tmf_only     0.021 0.019 0.023 20000
+
+By department (n >= 100):
+        department    n  hansen   tmf  both  disagree  hansen_only  tmf_only
+              Meta 6254   0.086 0.023 0.015     0.079        0.071     0.008
+             Cesar 3066   0.153 0.088 0.058     0.124        0.095     0.030
+         Santander 3017   0.277 0.134 0.103     0.204        0.174     0.030
+          Casanare 2470   0.051 0.004 0.002     0.052        0.049     0.003
+Norte De Santander 1535   0.392 0.203 0.147     0.302        0.245     0.057
+           Bolivar 1369   0.209 0.035 0.025     0.195        0.184     0.010
+         Magdalena 1216   0.147 0.035 0.023     0.136        0.124     0.012
+         Antioquia  293   0.068 0.191 0.027     0.205        0.041     0.164
+      Cundinamarca  254   0.287 0.114 0.087     0.228        0.201     0.028
+           Vichada  156   0.006 0.006 0.006     0.000        0.000     0.000
+           Cordoba  143   0.014 0.028 0.000     0.042        0.014     0.028
+
+Decision rule: disagreement 0.134 [0.129, 0.139] -> answer does not depend on the product
+Expectation (Hansen > TMF): met

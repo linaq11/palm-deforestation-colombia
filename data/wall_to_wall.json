@@ -1,0 +1,13 @@
+{
+ "both_ha": 17112.3,
+ "disagree_ha": 48184.8,
+ "hansen_ha": 57665.6,
+ "palm_ha": 360124.3,
+ "palm_px": 4714287.8,
+ "tmf_ha": 24743.9,
+ "share_hansen": 0.1601,
+ "share_tmf": 0.0687,
+ "share_both": 0.0475,
+ "share_disagree": 0.1338,
+ "cells_with_palm": 111
+}
