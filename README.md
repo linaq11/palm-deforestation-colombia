@@ -10,7 +10,7 @@ How much of the oil palm planted in Colombia between 2001 and 2018 was forest be
 
 ## Result
 
-Oil palm planted from 2001 to 2018 in mainland Colombia: **360,124 ha** (wall-to-wall).
+Oil palm planted from 2001 to 2018 in Colombia (LSIB outline): **360,124 ha** (wall-to-wall).
 
 | Share of that palm that was forest before planting | Estimate | 95 % interval |
 |---|---|---|
@@ -23,7 +23,7 @@ Simple random sample of 20,000 palm pixels of 30 m, 2,000 bootstrap resamples. T
 
 **Preregistered verdict.** The products were to be called in material disagreement if they disagreed on at least 20 % of the palm area with the lower end of the interval above 10 %. They disagree on 13.4 %, so under the rule fixed in advance **the answer does not depend on the product**. The stated expectation was met only in part: Hansen does give the higher share, but the disagreement is not material by that rule.
 
-**Exploratory, not preregistered.** Hansen still finds 2.4 times as much converted forest as TMF. The rule measured pixel-level disagreement over all palm, and with only about one palm pixel in six on former forest it could hardly reach 20 %. The rule is reported as it was written.
+**Exploratory, not preregistered.** Hansen still finds 2.4 times as much converted forest as TMF in the sample (2.3 times wall-to-wall). The rule measured pixel-level disagreement over all palm, and with only about one palm pixel in six on former forest according to Hansen, it could hardly reach 20 %. The rule is reported as it was written.
 
 ### By type of grower, threshold and department
 
@@ -34,15 +34,15 @@ Simple random sample of 20,000 palm pixels of 30 m, 2,000 bootstrap resamples. T
 | Hansen tree cover ≥ 10 % instead of 30 % | 16.1 % | 6.8 % | 13.6 % | 20,000 |
 | Hansen tree cover ≥ 50 % | 15.6 % | 6.8 % | 13.1 % | 20,000 |
 
-By department (sample, at least 100 pixels), Hansen ranges from 39 % in Norte de Santander and 28 % in Santander to 9 % in Meta and 5 % in Casanare. Antioquia is the one department where TMF finds more than Hansen (19 % against 7 %). The full table is in [data/results_department.csv](data/results_department.csv).
+By department (sample, at least 100 pixels, no intervals), Hansen gives 39 % in Norte de Santander, 29 % in Cundinamarca and 28 % in Santander, against 9 % in Meta, 5 % in Casanare and under 1 % in Vichada. TMF finds more than Hansen in two departments: Antioquia (19 % against 7 %, 293 pixels) and Córdoba (2.8 % against 1.4 %, 143 pixels). The full table is in [data/results_department.csv](data/results_department.csv).
 
 ![National 20 km grid and the department comparison](docs/screenshot_es_map.jpg)
 
 ### Three cells up close
 
-The preregistration fixed how the detail areas would be chosen: on a 20 km grid (EPSG:9377), among the 137 cells with at least 500 ha of palm, the two with the most palm on forest according to both products and the two with the largest disagreement. One cell is first in both lists, so the rule gives three cells, all in the Middle Magdalena.
+The preregistration fixed how the detail areas would be chosen: on a 20 km grid, among the cells with at least 500 ha of palm (137 of them), the two with the most palm on forest according to both products and the two with the largest disagreement. The grid itself (EPSG:9377, cells aligned to its origin) was defined at implementation, after the national results were in. One cell is in both lists (second in the first, first in the second), so the rule gives three cells, next to each other in the Middle Magdalena.
 
-| Cell | Municipality at the cell centre | Palm | Forest, both products | Disagreement |
+| Cell | Municipality at the cell centre (FAO GAUL 2015) | Palm | Forest, both products | Disagreement |
 |---|---|---|---|---|
 | E4940_N2400 | San Alberto, Cesar | 6,785 ha | 2,035 ha | 1,510 ha |
 | E4900_N2360 | Puerto Wilches, Santander | 8,408 ha | 1,915 ha | 2,714 ha |
@@ -59,26 +59,27 @@ For a palm pixel with planting year Y (industrial or smallholder, Y from 2001 to
 - **Hansen says forest** if tree cover in 2000 was at least 30 % and loss was recorded between 2001 and Y + 2.
 - **TMF says forest** if the pixel was undisturbed or degraded forest in December 2000 and was recorded as deforested in some year from 2001 to Y + 2.
 
-The two years after planting absorb the error of the planting year. Both rules live in [src/palmforest/rules.py](src/palmforest/rules.py) and are tested on synthetic pixels with known histories (forest cleared then planted, pasture planted, old palm replanted, forest cleared ten years earlier, clearing after the margin, degraded forest, regrowth). Each rule was broken on purpose once before the real run, and each time a test failed naming the wrong case.
+The two years after planting allow for error in the planting year. Both rules live in [src/palmforest/rules.py](src/palmforest/rules.py) and are tested on synthetic pixels with known histories (forest cleared then planted, pasture planted, old palm replanted, forest cleared ten years earlier, clearing after the margin, degraded forest, regrowth). Each rule was broken on purpose before the real run and a test failed each time, but that first round was not logged. After an audit showed that the tests did not pin the two-year margin or the exact threshold, boundary cases were added and the breaks were repeated and recorded in [tests/NEGATIVE_TESTS.md](tests/NEGATIVE_TESTS.md); the rules did not change.
 
 ## What it does not say
 
 - Neither product is the truth. The comparison measures how much the answer moves with the forest map, not how much forest was really lost.
 - The planting year is the last rotation. Old palm cleared and replanted can look like forest to Hansen, which counts tree cover and not forest type.
-- Neither product records loss before 2001, so palm planted in the first years shows less forest by construction. The chart by planting year is not a trend.
+- The rules count loss only from 2001 (Hansen's loss record starts in 2001, and the TMF rule asks for forest in December 2000), so palm planted in the first years shows less forest by construction. The chart by planting year is not a trend. The preregistration justified the 2001 start by saying both products begin their loss record that year; that holds for Hansen but not for TMF, whose annual record goes back to 1990. The rule was kept as written.
+- Hansen leaves the loss year empty where there was no loss, and the rules read it that way: 15,936 of the 20,000 sample pixels have it empty and none has 0 ([data/input_checks.json](data/input_checks.json)). The wall-to-wall check cannot test this, because both sides make the same reading.
 - TMF maps tropical moist forest only. Palm on dry forest in the Caribbean cannot count as forest for TMF, which is one reason the results are given by department.
 - It is not an assessment under the EU Deforestation Regulation, whose cut-off date is 31 December 2020.
-- Only aggregated cells and satellite imagery are shown: no farm boundaries, owners or companies.
+- Three detail cells show 30 m palm pixels, which reveal the shape of plantations, as the satellite image does. There are no property boundaries, owners or companies anywhere in the repository.
 
 ## Reproduce
 
-Needs an Earth Engine project with the API enabled (`earthengine authenticate` once).
+Needs an Earth Engine project with the API enabled (`earthengine authenticate` once). Commands are for a POSIX shell. To recompute the wall-to-wall sums from scratch, delete `data/cells_w2w.csv` first.
 
 ```bash
 pip install -r requirements.txt
 PYTHONPATH=src python -m pytest -q tests          # the rules on synthetic pixels
-python scripts/tiled.py --project <ee-project>    # wall-to-wall sums and the 20,000-pixel sample
-python scripts/analyze.py                         # estimates, intervals, decision rule -> data/results.txt
+python scripts/tiled.py --project <ee-project>    # wall-to-wall sums (reused if data/cells_w2w.csv exists) and the sample
+python scripts/analyze.py                         # estimates, intervals, decision rule -> data/results*.csv, results.txt
 python scripts/grid20km.py --project <ee-project> # 20 km grid and the detail cells
 python scripts/dashboard_data.py --project <ee-project>   # files read by docs/index.html
 ```
@@ -101,17 +102,17 @@ python scripts/dashboard_data.py --project <ee-project>   # files read by docs/i
 
 ¿Cuánta de la palma de aceite sembrada en Colombia entre 2001 y 2018 era bosque antes de la siembra? La respuesta depende del mapa de bosque que se consulte, y este repositorio mide cuánto. Hansen Global Forest Change y JRC Tropical Moist Forest (TMF) se aplican píxel a píxel sobre el mapa global de año de siembra de palma de Descals et al. (2024), con reglas escritas antes de leer cualquier valor de pérdida de bosque sobre palma ([PREREGISTRATION.md](PREREGISTRATION.md)).
 
-**Resultado.** La palma sembrada entre 2001 y 2018 en Colombia continental suma 360.124 ha. Según Hansen, el 15,9 % de esa área era bosque (IC 95 %: 15,5 a 16,4); según TMF, el 6,8 % (6,4 a 7,1). Los productos discrepan en el 13,4 % del área (12,9 a 13,9). El cálculo sobre toda el área cae dentro de los cuatro intervalos.
+**Resultado.** La palma sembrada entre 2001 y 2018 en Colombia (contorno LSIB) suma 360.124 ha. Según Hansen, el 15,9 % de esa área era bosque (IC 95 %: 15,5 a 16,4); según TMF, el 6,8 % (6,4 a 7,1). Los productos discrepan en el 13,4 % del área (12,9 a 13,9). El cálculo sobre toda el área cae dentro de los cuatro intervalos.
 
-**Veredicto preregistrado.** La regla exigía un desacuerdo de al menos 20 % para hablar de discrepancia material. Con 13,4 %, el veredicto es que la respuesta no depende del producto. La expectativa declarada se cumplió solo a medias: Hansen sí da más que TMF, pero el desacuerdo no llega a ser material según la regla.
+**Veredicto preregistrado.** La regla exigía un desacuerdo de al menos 20 %, con el límite inferior del intervalo por encima de 10 %, para hablar de discrepancia material. Con 13,4 %, el veredicto es que la respuesta no depende del producto. La expectativa declarada se cumplió solo a medias: Hansen sí da más que TMF, pero el desacuerdo no llega a ser material según la regla.
 
-**Exploratorio.** Aun así, Hansen encuentra 2,4 veces más bosque convertido que TMF. La regla medía desacuerdo píxel a píxel sobre toda la palma, y con cerca de un píxel de cada seis sobre bosque antiguo ese desacuerdo difícilmente llegaba a 20 %. Se reporta la regla tal como se escribió.
+**Exploratorio.** Aun así, Hansen encuentra 2,4 veces más bosque convertido que TMF en la muestra (2,3 veces en el cálculo sobre toda el área). La regla medía desacuerdo píxel a píxel sobre toda la palma, y con cerca de un píxel de cada seis sobre lo que antes era bosque según Hansen, ese desacuerdo difícilmente llegaba a 20 %. Se reporta la regla tal como se escribió.
 
-**Por departamento.** Según Hansen, la palma sobre bosque va de 39 % en Norte de Santander y 28 % en Santander a 9 % en Meta y 5 % en Casanare. Antioquia es el único departamento donde TMF supera a Hansen (19 % contra 7 %). En los pequeños productores la proporción es mayor que en la palma industrial (18,8 % contra 15,2 % según Hansen).
+**Por departamento** (muestra, sin intervalos). Según Hansen, la palma sobre bosque es 39 % en Norte de Santander, 29 % en Cundinamarca y 28 % en Santander, contra 9 % en Meta, 5 % en Casanare y menos de 1 % en Vichada. TMF supera a Hansen en dos departamentos: Antioquia (19 % contra 7 %, 293 píxeles) y Córdoba (2,8 % contra 1,4 %, 143 píxeles). En los pequeños productores la proporción es mayor que en la palma industrial (18,8 % contra 15,2 % según Hansen).
 
-**Celdas de detalle.** La regla preregistrada, aplicada a la grilla de 20 km, dio tres celdas en el Magdalena Medio (San Alberto, Puerto Wilches y Sabana de Torres) porque una de ellas encabeza las dos listas. El dashboard las muestra con imágenes Landsat de 1999 a 2001 y de 2022 a 2024.
+**Celdas de detalle.** La regla preregistrada, aplicada a una grilla de 20 km que se definió al implementar, después de tener los resultados nacionales, dio tres celdas vecinas en el Magdalena Medio (San Alberto, Puerto Wilches y Sabana de Torres) porque una de ellas está en las dos listas. El dashboard las muestra con imágenes Landsat de 1999 a 2001 y de 2022 a 2024.
 
-**Lo que no dice.** Ninguno de los dos productos es la verdad. El año de siembra corresponde a la última rotación. Ningún producto registra pérdida antes de 2001, así que los primeros años de siembra salen bajos por construcción. TMF solo cubre bosque húmedo tropical. No es una evaluación del reglamento europeo de deforestación (EUDR), cuya fecha de corte es el 31 de diciembre de 2020. Solo se muestran celdas agregadas e imágenes satelitales: ni linderos, ni propietarios, ni empresas.
+**Lo que no dice.** Ninguno de los dos productos es la verdad. El año de siembra corresponde a la última rotación. Las reglas solo cuentan pérdida desde 2001, así que los primeros años de siembra salen bajos por construcción. En Hansen, el año de pérdida vacío se lee como «sin pérdida». TMF solo cubre bosque húmedo tropical. No es una evaluación del reglamento europeo de deforestación (EUDR), cuya fecha de corte es el 31 de diciembre de 2020. En tres celdas se muestran píxeles de palma de 30 m, que dejan ver la forma de las plantaciones, igual que la imagen satelital; no hay linderos de predios, propietarios ni empresas.
 
 ## License
 

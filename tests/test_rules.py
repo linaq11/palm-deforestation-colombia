@@ -49,3 +49,22 @@ def test_threshold_sensitivity():
 def test_unknown_tmf_code_stops():
     with pytest.raises(ValueError):
         tmf_forest(tmf_row(7)[None, :], [2010])
+
+
+# Exact boundaries of the preregistered rules (added after an audit showed MARGIN 1, 3 or 4 and `>` would pass)
+BOUNDARY = {
+    "Hansen loss at Y+2 counts": (lambda: hansen_forest([80], [12], [2010])[0], True),
+    "Hansen loss at Y+3 does not": (lambda: hansen_forest([80], [13], [2010])[0], False),
+    "Hansen loss at Y+1 counts": (lambda: hansen_forest([80], [11], [2010])[0], True),
+    "tree cover exactly at threshold counts": (lambda: hansen_forest([30], [5], [2008])[0], True),
+    "tree cover one below threshold does not": (lambda: hansen_forest([29], [5], [2008])[0], False),
+    "TMF deforested at Y+2 counts": (lambda: tmf_forest(tmf_row(1, {2012: 3})[None, :], [2010])[0], True),
+    "TMF deforested at Y+3 does not": (lambda: tmf_forest(tmf_row(1, {2013: 3})[None, :], [2010])[0], False),
+    "TMF loss in 2001 counts": (lambda: tmf_forest(tmf_row(1, {2001: 3})[None, :], [2001])[0], True),
+}
+
+
+@pytest.mark.parametrize("name", BOUNDARY)
+def test_boundaries(name):
+    f, expected = BOUNDARY[name]
+    assert f() == expected, f"boundary wrong on: {name}"

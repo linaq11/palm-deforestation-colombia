@@ -48,4 +48,5 @@ Norte De Santander 1535   0.392 0.203 0.147     0.302        0.245     0.057
            Cordoba  143   0.014 0.028 0.000     0.042        0.014     0.028
 
 Decision rule: disagreement 0.134 [0.129, 0.139] -> answer does not depend on the product
-Expectation (Hansen > TMF): met
+Expectation, part 1 (Hansen > TMF): met
+Expectation, part 2 (disagreement material): NOT met

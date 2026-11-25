@@ -7,6 +7,7 @@
                              G = bit 1 Hansen forest, bit 2 TMF forest, bit 4 smallholder, bit 8 tree cover 2000 >= 30
                              B = Hansen loss year - 2000 (0 = no loss),  A = 255
   docs/data/cell_<id>_2000.jpg, _2023.jpg   Landsat false colour (SWIR1, NIR, red) medians, 1999-2001 and 2022-2024
+  municipality of each detail cell: FAO GAUL 2015 level 2 at the cell centre
 USE: python scripts/dashboard_data.py --project P
 """
 import argparse
@@ -30,7 +31,7 @@ from wall_to_wall import forest_images  # noqa: E402
 
 DATA, OUT = ROOT / "data", ROOT / "docs" / "data"
 RES = 0.00025                       # Hansen pixel, degrees
-B, SEED = 1000, 0
+B, SEED = 2000, 0
 
 
 def by_year(d):
@@ -119,6 +120,9 @@ def main():
             im = Image.open(io.BytesIO(requests.get(url, timeout=300).content)).convert("RGB")
             im.save(OUT / f"cell_{cid}_{tag}.jpg", quality=82)
             c[f"scenes_{tag}"] = n.getInfo()
+        gaul2 = ee.FeatureCollection("FAO/GAUL/2015/level2").filter(ee.Filter.eq("ADM0_NAME", "Colombia"))
+        m = gaul2.filterBounds(ee.Geometry.Point(c["lon"], c["lat"])).first().toDictionary(["ADM1_NAME", "ADM2_NAME"]).getInfo()
+        c["municipality"] = m["ADM2_NAME"].replace(" De ", " de "); c["department"] = m["ADM1_NAME"]
         print(cid, "pixels", nx, "x", ny, "palm px", int((arr["r"] > 0).sum()),
               "scenes", c["scenes_2000"], c["scenes_2023"])
     summary["cells"] = ids

@@ -3,6 +3,7 @@
 Pixels are on a geographic 30 m grid, so each sampled pixel is weighted by cos(latitude) to turn pixel counts into area.
 USE: python scripts/analyze.py  ->  data/results.csv, data/results.txt
 """
+import json
 import sys
 from pathlib import Path
 
@@ -45,6 +46,10 @@ def main():
     print("read", f, d.shape)
     assert len(d) >= 19000, "sample smaller than expected"
     assert d.planting_year.between(2001, 2018).all() and d.classification.isin([1, 2]).all()
+    checks = {"pixels": int(len(d)), "lossyear_masked_(-1)_read_as_no_loss": int((d.lossyear == -1).sum()),
+              "lossyear_equal_0": int((d.lossyear == 0).sum()),
+              "any_other_band_missing_(-1)": int((d.drop(columns=["lossyear"]).select_dtypes("number") == -1).sum().sum())}
+    (ROOT / "data" / "input_checks.json").write_text(json.dumps(checks, indent=1)); print("input checks", checks)
     w = np.cos(np.radians(d.lat.to_numpy()))
     rows = []
     h, t = flags(d)
@@ -72,7 +77,8 @@ def main():
              "By department (n >= 100):", D[D.n >= 100].to_string(index=False), "",
              "Decision rule: disagreement %.3f [%.3f, %.3f] -> %s" % (
                  dis.estimate, dis.lo95, dis.hi95, "products DISAGREE MATERIALLY" if material else "answer does not depend on the product"),
-             "Expectation (Hansen > TMF): %s" % ("met" if a.loc["hansen"].estimate > a.loc["tmf"].estimate else "NOT met")]
+             "Expectation, part 1 (Hansen > TMF): %s" % ("met" if a.loc["hansen"].estimate > a.loc["tmf"].estimate else "NOT met"),
+             "Expectation, part 2 (disagreement material): %s" % ("met" if material else "NOT met")]
     (ROOT / "data" / "results.txt").write_text("\n".join(lines), encoding="utf-8"); print("\n".join(lines))
 
 
