@@ -98,8 +98,8 @@ footer{padding:48px 0 60px;color:var(--faint);font-size:14px}
   <div><div class="num t" id="nT"></div><div class="who t">JRC Tropical Moist Forest</div><div class="ci" id="ciT"></div></div>
 </div>
 <div class="verdict">
-  <div><span class="tag" data-i="tagPre"></span><span id="verdict"></span></div>
-  <div><span class="tag" data-i="tagExp"></span><span id="explo"></span></div>
+  <p id="verdict" style="margin:0"></p>
+  <p id="explo" style="margin:0"></p>
 </div>
 
 <section>
@@ -169,56 +169,58 @@ footer{padding:48px 0 60px;color:var(--faint);font-size:14px}
 
 <script>
 const T = {
- es:{brand:"Palma de aceite y bosque · Colombia 2001–2018",
-  title:"¿Cuánta palma de aceite reemplazó bosque en Colombia? Depende del mapa de bosque.",
-  lede:"Palma sembrada entre 2001 y 2018 en Colombia, según el mapa global de palma de Descals et al. (2024): {palm} ha. Porcentaje de esa área que era bosque antes de la siembra, según los dos productos globales de bosque más usados.",
-  pctOf:"de la palma era bosque", tagPre:"Preregistrado", tagExp:"Exploratorio",
-  verdictTxt:"Los productos discrepan en {d} del área de palma (IC 95 %: {lo} a {hi}). La regla fijada antes de mirar pedía al menos 20 %, con el límite inferior del intervalo por encima de 10 %, así que el veredicto es: la respuesta no depende del producto.",
-  exploTxt:"Aun así, Hansen ve {r} veces más bosque convertido que TMF. La regla medía desacuerdo píxel a píxel sobre toda la palma; con tan poca palma sobre bosque, ese desacuerdo difícilmente llegaba a 20 %. Se reporta la regla tal como se escribió.",
-  mapH:"Dónde la palma reemplazó bosque", mapSub:"Celdas de 20 km con palma sembrada entre 2001 y 2018. El color es la palma que era bosque, en hectáreas. Toca una celda para ver sus cifras; las tres celdas marcadas son las de detalle.",
-  disagreeBtn:"Desacuerdo", yearH:"Por año de siembra", bandNote:"banda: IC 95 % de la muestra",
-  yearNote:"No es una tendencia. Las reglas solo cuentan pérdida desde 2001: para la palma sembrada en 2001 solo entran los años 2001 a 2003, y el bosque talado antes no cuenta. Los primeros años salen bajos por construcción.",
-  deptH:"Por departamento (muestra, n ≥ 100)",
-  detH:"Tres celdas de cerca, en el Magdalena Medio", detSub:"Elegidas con la regla del preregistro, sobre una grilla de 20 km (EPSG:9377) que se definió al implementar: entre las celdas con al menos 500 ha de palma, las dos con más palma sobre bosque según ambos productos y las dos con mayor desacuerdo. Una celda está en las dos listas, por eso son tres.",
-  swipe:"Antes / después", planted:"Sembrada hasta", compareBtn:"Comparar", offBtn:"Sin píxeles",
-  falseColour:"Falso color Landsat (SWIR, infrarrojo cercano, rojo): la vegetación sale verde y la palma joven, más clara y en retícula.",
-  palmF:"palma sobre bosque", palmNF:"palma sin bosque previo", noDis:"palma sin desacuerdo", hOnly:"solo Hansen dice bosque", tOnly:"solo TMF dice bosque", bothF:"los dos dicen bosque",
-  fPalm:"Palma 2001–2018", fH:"Bosque según Hansen", fT:"Bosque según TMF", fD:"Desacuerdo",
-  centre:"Municipio en el centro de la celda: {m}. Composiciones con {a} y {b} escenas.",
-  howH:"Cómo se hizo y qué no dice",
-  limits:["Bosque según Hansen: cobertura arbórea de 30 % o más en 2000 y pérdida entre 2001 y el año de siembra + 2. Según TMF: bosque no perturbado o degradado en 2000 y deforestado en esa misma ventana. Los 2 años de margen cubren el error del año de siembra.",
-   "Muestra aleatoria simple de 20.000 píxeles de 30 m, intervalos por bootstrap (2.000 remuestreos). El cálculo sobre toda el área cae dentro de los intervalos.",
-   "En Hansen, el año de pérdida viene vacío donde no hubo pérdida, y así se lee: 15.936 de los 20.000 píxeles de la muestra lo traen vacío y ninguno trae 0.",
-   "Ninguno de los dos productos es la verdad. El año de siembra corresponde a la última rotación: una palma vieja resembrada puede parecer bosque para Hansen.",
-   "TMF solo cubre bosque húmedo tropical. La palma sobre bosque seco del Caribe no puede contar como bosque para TMF; por eso las cifras se dan por departamento.",
-   "No es una evaluación del reglamento europeo de deforestación (EUDR), cuya fecha de corte es el 31 de diciembre de 2020.",
-   "En tres celdas se muestran píxeles de palma de 30 m, que dejan ver la forma de las plantaciones, igual que la imagen satelital. No hay linderos de predios, propietarios ni empresas."],
-  footer:"Datos: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025, Landsat Colección 2. Procesado en Google Earth Engine. El preregistro, el código y las pruebas están en el repositorio."},
- en:{brand:"Oil palm and forest · Colombia 2001–2018",
-  title:"How much Colombian oil palm replaced forest? It depends on the forest map.",
-  lede:"Oil palm planted from 2001 to 2018 in Colombia, per the global palm map of Descals et al. (2024): {palm} ha. Share of that area that was forest before planting, according to the two most used global forest products.",
-  pctOf:"of the palm was forest", tagPre:"Preregistered", tagExp:"Exploratory",
-  verdictTxt:"The products disagree on {d} of the palm area (95% CI {lo} to {hi}). The rule fixed before looking required at least 20%, with the lower end of the interval above 10%, so the verdict is: the answer does not depend on the product.",
-  exploTxt:"Still, Hansen sees {r} times more converted forest than TMF. The rule measured pixel-level disagreement over all palm; with so little palm on forest, it could hardly reach 20%. The rule is reported as written.",
-  mapH:"Where palm replaced forest", mapSub:"20 km cells with palm planted 2001 to 2018. Colour is palm that was forest, in hectares. Tap a cell for its numbers; the three outlined cells are the detail cells.",
-  disagreeBtn:"Disagreement", yearH:"By planting year", bandNote:"band: sample 95% CI",
-  yearNote:"Not a trend. The rules count loss only from 2001: for palm planted in 2001 only 2001 to 2003 enter, and forest cleared earlier does not count. Early years are low by construction.",
-  deptH:"By department (sample, n ≥ 100)",
-  detH:"Three cells up close, in the Middle Magdalena", detSub:"Chosen with the preregistered rule, on a 20 km grid (EPSG:9377) defined at implementation: among cells with at least 500 ha of palm, the two with the most palm on forest by both products and the two with the largest disagreement. One cell is in both lists, so there are three.",
-  swipe:"Before / after", planted:"Planted up to", compareBtn:"Compare", offBtn:"No pixels",
-  falseColour:"Landsat false colour (SWIR, near infrared, red): vegetation shows green, young palm lighter and in a grid.",
-  palmF:"palm on forest", palmNF:"palm with no prior forest", noDis:"palm with no disagreement", hOnly:"only Hansen says forest", tOnly:"only TMF says forest", bothF:"both say forest",
-  fPalm:"Palm 2001–2018", fH:"Forest per Hansen", fT:"Forest per TMF", fD:"Disagreement",
-  centre:"Municipality at the cell centre: {m}. Composites from {a} and {b} scenes.",
-  howH:"How it was done, and what it does not say",
-  limits:["Forest per Hansen: tree cover of 30% or more in 2000 and loss between 2001 and planting year + 2. Per TMF: undisturbed or degraded forest in 2000 and deforested in the same window. The 2-year margin covers planting-year error.",
-   "Simple random sample of 20,000 pixels of 30 m, bootstrap intervals (2,000 resamples). The wall-to-wall computation falls inside the intervals.",
-   "In Hansen the loss year is empty where there was no loss, and it is read that way: 15,936 of the 20,000 sample pixels have it empty and none has 0.",
-   "Neither product is the truth. Planting year is the last rotation: old palm replanted can look like forest to Hansen.",
-   "TMF covers tropical moist forest only. Palm on Caribbean dry forest cannot count as forest for TMF, which is why results are given by department.",
-   "This is not an assessment under the EU Deforestation Regulation (EUDR), whose cut-off date is 31 December 2020.",
-   "Three cells show 30 m palm pixels, which reveal the shape of plantations, as the satellite image does. There are no property boundaries, owners or companies."],
-  footer:"Data: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025, Landsat Collection 2. Processed in Google Earth Engine. Preregistration, code and tests are in the repository."}
+ es:{brand:"Palma de aceite y bosque en Colombia",
+  title:"¿Cuánta palma de aceite se sembró sobre bosque en Colombia?",
+  lede:"Entre 2001 y 2018 se sembraron en Colombia {palm} ha de palma de aceite, según el mapa de Descals et al. (2024). Estas son las proporciones de esa palma que antes eran bosque según dos mapas globales de bosque: el de Hansen y el del JRC (TMF).",
+  pctOf:"de la palma era bosque", ciLbl:"intervalo de 95 %: {lo} a {hi} %",
+  verdictTxt:"Los dos mapas discrepan en el {d} de la palma (intervalo de 95 %: {lo} a {hi}). En el preregistro se fijó que la discrepancia contaría como importante a partir de 20 %, así que con esa regla el resultado no depende del mapa.",
+  exploTxt:"Aun así, Hansen da {r} veces lo que da TMF. Con estas dos cifras, la discrepancia no podía pasar de {max}.",
+  mapH:"Mapa por celdas de 20 km", mapSub:"Cada celda muestra las hectáreas de palma que antes eran bosque. Al tocar una celda aparecen sus cifras. Las tres celdas con borde claro son las que se ven de cerca más abajo.",
+  disagreeBtn:"Discrepancia", yearH:"Según el año de siembra", bandNote:"franja: intervalo de 95 %",
+  yearNote:"Las reglas solo cuentan pérdida desde 2001. Para la palma sembrada en 2001 solo entran 2001, 2002 y 2003, así que los primeros años salen bajos aunque haya habido tala antes.",
+  deptH:"Por departamento (con al menos 100 píxeles en la muestra)",
+  detH:"Tres celdas en el Magdalena Medio", detSub:"Se eligieron con la regla del preregistro: entre las celdas con al menos 500 ha de palma, las dos con más palma sobre bosque según ambos mapas y las dos con más discrepancia. Puerto Wilches está en las dos listas, por eso son tres. La grilla se armó después de tener los resultados nacionales.",
+  swipe:"Antes y después", planted:"Sembrada hasta", compareBtn:"Comparar", offBtn:"Solo imagen",
+  falseColour:"La imagen está en falso color: la vegetación se ve verde y la palma joven, más clara y en cuadrícula.",
+  palmF:"palma que era bosque", palmNF:"palma que no era bosque", noDis:"sin discrepancia", hOnly:"bosque solo para Hansen", tOnly:"bosque solo para TMF", bothF:"bosque para los dos",
+  fPalm:"Palma sembrada 2001–2018", fH:"Era bosque según Hansen", fT:"Era bosque según TMF", fD:"Discrepancia",
+  centre:"En el centro de la celda está el municipio de {m}. Las imágenes combinan {a} escenas de 1999 a 2001 y {b} escenas de 2022 a 2024.",
+  howH:"Método y limitaciones",
+  limits:["Para Hansen, un píxel de palma era bosque si en 2000 tenía al menos 30 % de cobertura arbórea y la perdió entre 2001 y dos años después de la siembra. Para TMF, si en diciembre de 2000 era bosque sin perturbar o degradado y fue deforestado en ese mismo periodo. Los dos años de margen dan espacio al error en el año de siembra.",
+   "Las cifras salen de una muestra aleatoria de 20.000 píxeles de 30 m, con intervalos por bootstrap de 2.000 remuestreos. El cálculo sobre todos los píxeles cae dentro de esos intervalos.",
+   "Hansen deja vacío el año de pérdida cuando no hubo pérdida, y así se interpreta. En la muestra, 15.936 de los 20.000 píxeles lo tienen vacío y ninguno tiene 0.",
+   "No se usaron datos de campo. Lo que se mide es cuánto cambia la respuesta de un mapa de bosque a otro, no cuánto bosque se perdió.",
+   "El año de siembra es el de la última rotación. Una palma vieja que se tumbó y se volvió a sembrar puede contar como bosque para Hansen, que mide cobertura arbórea y no tipo de bosque.",
+   "TMF solo cubre bosque húmedo tropical, así que la palma sembrada sobre bosque seco en el Caribe no cuenta como bosque para TMF.",
+   "No es una evaluación para el reglamento europeo de deforestación (EUDR), cuya fecha de corte es el 31 de diciembre de 2020.",
+   "Las tres celdas de detalle muestran píxeles de palma de 30 m. No hay linderos de predios, propietarios ni empresas."],
+  footer:"Datos: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025 y Landsat Colección 2, procesados en Google Earth Engine. El preregistro, el código y las pruebas están en el repositorio de GitHub."},
+ en:{brand:"Oil palm and forest in Colombia",
+  title:"How much of Colombia's oil palm was planted on forest?",
+  lede:"From 2001 to 2018, {palm} ha of oil palm were planted in Colombia, according to the map by Descals et al. (2024). These are the shares of that palm that used to be forest according to two global forest maps: Hansen's and the JRC's (TMF).",
+  pctOf:"of the palm was forest", ciLbl:"95% interval: {lo} to {hi}%",
+  verdictTxt:"The two maps disagree on {d} of the palm (95% interval: {lo} to {hi}). The preregistration set 20% as the point where the disagreement would count as important, so under that rule the result does not depend on the map.",
+  exploTxt:"Even so, Hansen's figure is {r} times TMF's. With these two figures, the disagreement could not have gone above {max}.",
+  mapH:"Map by 20 km cells", mapSub:"Each cell shows the hectares of palm that used to be forest. Tap a cell to see its figures. The three cells with a light outline are the ones shown up close below.",
+  disagreeBtn:"Disagreement", yearH:"By planting year", bandNote:"band: 95% interval",
+  yearNote:"The rules only count loss from 2001 on. For palm planted in 2001 only 2001, 2002 and 2003 enter, so the first years come out low even where forest was cleared earlier.",
+  deptH:"By department (at least 100 pixels in the sample)",
+  detH:"Three cells in the Middle Magdalena", detSub:"They were picked with the preregistered rule: among cells with at least 500 ha of palm, the two with the most palm on forest according to both maps and the two with the most disagreement. Puerto Wilches is in both lists, so there are three. The grid was built after the national results were in.",
+  swipe:"Before and after", planted:"Planted up to", compareBtn:"Compare", offBtn:"Image only",
+  falseColour:"The image is in false colour: vegetation looks green, and young palm lighter and in a grid.",
+  palmF:"palm that was forest", palmNF:"palm that was not forest", noDis:"no disagreement", hOnly:"forest for Hansen only", tOnly:"forest for TMF only", bothF:"forest for both",
+  fPalm:"Palm planted 2001–2018", fH:"Was forest per Hansen", fT:"Was forest per TMF", fD:"Disagreement",
+  centre:"The municipality at the centre of the cell is {m}. The images combine {a} scenes from 1999 to 2001 and {b} scenes from 2022 to 2024.",
+  howH:"Method and limitations",
+  limits:["For Hansen, a palm pixel was forest if it had at least 30% tree cover in 2000 and lost it between 2001 and two years after planting. For TMF, if it was undisturbed or degraded forest in December 2000 and was deforested in that same period. The two extra years leave room for error in the planting year.",
+   "The figures come from a random sample of 20,000 pixels of 30 m, with bootstrap intervals from 2,000 resamples. The calculation over all pixels falls inside those intervals.",
+   "Hansen leaves the loss year empty where there was no loss, and it is read that way. In the sample, 15,936 of the 20,000 pixels have it empty and none has 0.",
+   "No field data were used. What is measured is how much the answer changes from one forest map to the other, not how much forest was lost.",
+   "The planting year is that of the last rotation. Old palm that was cut and replanted can count as forest for Hansen, which measures tree cover and not forest type.",
+   "TMF only covers tropical moist forest, so palm planted on dry forest in the Caribbean does not count as forest for TMF.",
+   "This is not an assessment for the EU Deforestation Regulation (EUDR), whose cut-off date is 31 December 2020.",
+   "The three detail cells show 30 m palm pixels. There are no property boundaries, owners or companies."],
+  footer:"Data: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025 and Landsat Collection 2, processed in Google Earth Engine. The preregistration, code and tests are in the GitHub repository."}
 };
 const town = id => S.cells[id].municipality + " (" + S.cells[id].department + ")";
 let L = "es", S, G, cur = null, mapMode = "hansen", pxMode = "hansen";
@@ -238,11 +240,10 @@ function text() {
   $(".lede").textContent = fill(T[L].lede, {palm: fmt(S.wall_to_wall.palm_ha)});
   const h = res("all", "hansen"), t = res("all", "tmf"), d = res("all", "disagree");
   $("#nH").innerHTML = fmt(h.estimate * 100, 1) + "<small>%</small>"; $("#nT").innerHTML = fmt(t.estimate * 100, 1) + "<small>%</small>";
-  const ci = L === "es" ? " · IC 95 % " : " · 95% CI ";
-  $("#ciH").textContent = T[L].pctOf + ci + pct(h.lo95) + "–" + pct(h.hi95);
-  $("#ciT").textContent = T[L].pctOf + ci + pct(t.lo95) + "–" + pct(t.hi95);
+  $("#ciH").textContent = T[L].pctOf + " (" + fill(T[L].ciLbl, {lo: fmt(h.lo95 * 100, 1), hi: fmt(h.hi95 * 100, 1)}) + ")";
+  $("#ciT").textContent = T[L].pctOf + " (" + fill(T[L].ciLbl, {lo: fmt(t.lo95 * 100, 1), hi: fmt(t.hi95 * 100, 1)}) + ")";
   $("#verdict").textContent = fill(T[L].verdictTxt, {d: pct(d.estimate), lo: pct(d.lo95), hi: pct(d.hi95)});
-  $("#explo").textContent = fill(T[L].exploTxt, {r: fmt(h.estimate / t.estimate, 1)});
+  $("#explo").textContent = fill(T[L].exploTxt, {r: fmt(h.estimate / t.estimate, 1), max: pct(h.estimate + t.estimate)});
   $("#limits").innerHTML = T[L].limits.map(x => "<li>" + x + "</li>").join("");
   document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === L));
   drawMap(); drawYears(); drawDepts(); tabs(); facts(); legendPx();
