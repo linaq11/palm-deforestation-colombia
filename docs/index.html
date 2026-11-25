@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palma y bosque en Colombia</title>
+<meta name="description" content="How much Colombian oil palm planted 2001-2018 replaced forest, according to Hansen and to JRC TMF. Preregistered analysis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#0f1613; --panel:#16201b; --line:#2a3832; --ink:#e9ede6; --muted:#9aa89f; --faint:#5f6f66;
+  --hansen:#e3a33b; --tmf:#56b8c4; --both:#f3ead2; --palm:#7d8a5c; --focus:#f3ead2;
+  --serif:"Newsreader", Georgia, serif; --sans:"Figtree", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 var(--sans);font-variant-numeric:tabular-nums}
+a{color:var(--both)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.brand{font:600 14px var(--sans);letter-spacing:.04em;color:var(--muted)}
+.lang{flex:none;display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--muted);font:500 13px var(--sans);padding:6px 12px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--ink);color:var(--ground)}
+h1{font:600 clamp(32px,5vw,56px)/1.05 var(--serif);margin:24px 0 14px;max-width:18ch;text-wrap:balance}
+h2{font:600 28px/1.15 var(--serif);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);max-width:62ch;margin:0 0 28px}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line);border-radius:14px;overflow:hidden}
+.duel>div{background:var(--panel);padding:22px 24px}
+.num{font:600 clamp(56px,9vw,104px)/1 var(--serif)}
+.num small{font-size:.45em;margin-left:2px}
+.who{font-weight:600;margin-top:8px}
+.ci{color:var(--muted);font-size:14px}
+.h{color:var(--hansen)} .t{color:var(--tmf)}
+.verdict{margin:18px 0 0;padding:16px 20px;border:1px solid var(--line);border-radius:12px;display:grid;gap:6px;max-width:860px}
+.verdict b{font-weight:600}
+.tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.03em;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-right:6px}
+section{padding:56px 0 8px}
+.sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 14px}
+.seg button{background:none;border:0;border-right:1px solid var(--line);color:var(--ink);font:500 14px var(--sans);padding:8px 14px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--ground)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+svg text{fill:var(--muted);font:12px var(--sans)}
+#map{width:100%;height:auto;display:block}
+.cell{stroke:none;cursor:pointer}
+.cell:hover{stroke:var(--both);stroke-width:1.2}
+.pick{fill:none;stroke:var(--both);stroke-width:1.6}
+.tip{min-height:48px;font-size:14px;color:var(--muted);margin-top:8px}
+.tip b{color:var(--ink);font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:10px;align-items:center}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+.ramp{display:inline-block;width:120px;height:10px;border-radius:5px;vertical-align:middle;margin:0 6px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 14px;font:500 14px var(--sans);cursor:pointer;text-align:left}
+.tabs button[aria-pressed=true]{border-color:var(--both);box-shadow:inset 0 0 0 1px var(--both)}
+.tabs small{display:block;color:var(--muted);font-weight:400}
+.stage{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#000;touch-action:none}
+.stage img,.stage canvas,.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage canvas{image-rendering:pixelated}
+#after{clip-path:inset(0 0 0 50%)}
+.divider{position:absolute;top:0;bottom:0;width:2px;background:var(--both);left:50%;pointer-events:none}
+.yr{position:absolute;top:10px;padding:3px 9px;border-radius:999px;background:rgba(15,22,19,.78);font-size:13px;font-weight:600}
+.yr.l{left:10px} .yr.r{right:10px}
+.controls{display:grid;gap:14px;margin-top:14px}
+label.row{display:grid;grid-template-columns:150px 1fr 56px;gap:12px;align-items:center;font-size:14px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--both)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.facts div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.facts dt{font-size:13px;color:var(--muted)} .facts dd{margin:2px 0 0;font:600 26px var(--serif)}
+.note{font-size:14px;color:var(--muted);margin-top:12px}
+.limits{columns:2 320px;column-gap:32px;color:var(--muted);font-size:15px;padding-left:18px}
+.limits li{margin-bottom:10px;break-inside:avoid}
+footer{padding:48px 0 60px;color:var(--faint);font-size:14px}
+@media (max-width:860px){.grid2{grid-template-columns:1fr} label.row{grid-template-columns:110px 1fr 48px}}
+@media (max-width:520px){.duel{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand" data-i="brand"></div>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button data-lang="es" aria-pressed="true">ES</button><button data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<h1 data-i="title"></h1>
+<p class="lede" data-i="lede"></p>
+
+<div class="duel">
+  <div><div class="num h" id="nH"></div><div class="who h">Hansen Global Forest Change</div><div class="ci" id="ciH"></div></div>
+  <div><div class="num t" id="nT"></div><div class="who t">JRC Tropical Moist Forest</div><div class="ci" id="ciT"></div></div>
+</div>
+<div class="verdict">
+  <div><span class="tag" data-i="tagPre"></span><span id="verdict"></span></div>
+  <div><span class="tag" data-i="tagExp"></span><span id="explo"></span></div>
+</div>
+
+<section>
+  <h2 data-i="mapH"></h2>
+  <p class="sub" data-i="mapSub"></p>
+  <div class="seg" role="group" id="mapMode">
+    <button data-m="hansen" aria-pressed="true">Hansen</button><button data-m="tmf" aria-pressed="false">TMF</button><button data-m="disagree" aria-pressed="false" data-i="disagreeBtn"></button>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <svg id="map" role="img" aria-label="Map of Colombia with 20 km cells"></svg>
+      <div class="legend" id="mapLegend"></div>
+      <div class="tip" id="tip" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="card">
+        <h3 style="margin:0 0 4px;font:600 18px var(--serif)" data-i="yearH"></h3>
+        <svg id="years" viewBox="0 0 520 260"></svg>
+        <div class="legend"><span><i class="sw" style="background:var(--hansen)"></i>Hansen</span><span><i class="sw" style="background:var(--tmf)"></i>TMF</span><span data-i="bandNote"></span></div>
+        <p class="note" data-i="yearNote"></p>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3 style="margin:0 0 4px;font:600 18px var(--serif)" data-i="deptH"></h3>
+        <svg id="depts" viewBox="0 0 520 330"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="detail">
+  <h2 data-i="detH"></h2>
+  <p class="sub" data-i="detSub"></p>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid2">
+    <div>
+      <div class="stage" id="stage">
+        <img id="before" alt=""><img id="after" alt="">
+        <canvas id="px"></canvas>
+        <svg id="outline" viewBox="0 0 1 1" preserveAspectRatio="none"></svg>
+        <div class="divider" id="divider"></div>
+        <span class="yr l">Landsat 1999–2001</span><span class="yr r">Landsat 2022–2024</span>
+      </div>
+      <div class="controls">
+        <label class="row"><span data-i="swipe"></span><input type="range" id="swipe" min="0" max="100" value="50"><span id="swipeV"></span></label>
+        <label class="row"><span data-i="planted"></span><input type="range" id="year" min="2001" max="2018" value="2018"><span id="yearV"></span></label>
+        <div class="seg" role="group" id="pxMode" style="margin:0">
+          <button data-m="hansen" aria-pressed="true">Hansen</button><button data-m="tmf" aria-pressed="false">TMF</button><button data-m="disagree" aria-pressed="false" data-i="compareBtn"></button><button data-m="off" aria-pressed="false" data-i="offBtn"></button>
+        </div>
+        <div class="legend" id="pxLegend"></div>
+      </div>
+    </div>
+    <div>
+      <dl class="facts" id="facts"></dl>
+      <p class="note" data-i="falseColour"></p>
+      <p class="note" id="cellNote"></p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i="howH"></h2>
+  <ul class="limits" id="limits"></ul>
+</section>
+
+<footer data-i="footer"></footer>
+</div>
+
+<script>
+const T = {
+ es:{brand:"Palma de aceite y bosque · Colombia 2001–2018",
+  title:"¿Cuánta palma de aceite reemplazó bosque en Colombia? Depende del mapa de bosque.",
+  lede:"Palma sembrada entre 2001 y 2018 en Colombia continental, según el mapa global de palma de Descals et al. (2024): {palm} ha. Porcentaje de esa área que era bosque antes de la siembra, según los dos productos globales de bosque más usados.",
+  pctOf:"de la palma era bosque", tagPre:"Preregistrado", tagExp:"Exploratorio",
+  verdictTxt:"Los productos discrepan en {d} del área de palma (IC 95 %: {lo} a {hi}). La regla fijada antes de mirar pedía al menos 20 %, así que el veredicto es: la respuesta no depende del producto.",
+  exploTxt:"Aun así, Hansen ve {r} veces más bosque convertido que TMF. La regla medía desacuerdo píxel a píxel sobre toda la palma; con tan poca palma sobre bosque, ese desacuerdo difícilmente llegaba a 20 %. Se reporta la regla tal como se escribió.",
+  mapH:"Dónde la palma reemplazó bosque", mapSub:"Celdas de 20 km con palma sembrada entre 2001 y 2018. El color es la palma que era bosque, en hectáreas. Toca una celda para ver sus cifras; las tres celdas marcadas son las de detalle.",
+  disagreeBtn:"Desacuerdo", yearH:"Por año de siembra", bandNote:"banda: IC 95 % de la muestra",
+  yearNote:"No es una tendencia. Ningún producto registra pérdida antes de 2001: para la palma sembrada en 2001 solo se ven los años 2001 a 2003, y el bosque talado antes no cuenta. Los primeros años salen bajos por construcción.",
+  deptH:"Por departamento (muestra, n ≥ 100)",
+  detH:"Tres celdas de cerca, en el Magdalena Medio", detSub:"Elegidas por una regla fijada antes de ver los datos: las dos celdas con más palma sobre bosque según ambos productos y las dos con mayor desacuerdo. Una celda está en las dos listas, por eso son tres.",
+  swipe:"Antes / después", planted:"Sembrada hasta", compareBtn:"Comparar", offBtn:"Sin píxeles",
+  falseColour:"Falso color Landsat (SWIR, infrarrojo cercano, rojo): la vegetación sale verde y la palma joven, más clara y en retícula.",
+  palmF:"palma sobre bosque", palmNF:"palma sin bosque previo", hOnly:"solo Hansen dice bosque", tOnly:"solo TMF dice bosque", bothF:"los dos dicen bosque",
+  fPalm:"Palma 2001–2018", fH:"Bosque según Hansen", fT:"Bosque según TMF", fD:"Desacuerdo",
+  centre:"Municipio en el centro de la celda: {m}. Composiciones con {a} y {b} escenas.",
+  howH:"Cómo se hizo y qué no dice",
+  limits:["Bosque según Hansen: cobertura arbórea de 30 % o más en 2000 y pérdida entre 2001 y el año de siembra + 2. Según TMF: bosque no perturbado o degradado en 2000 y deforestado en esa misma ventana. Los 2 años de margen cubren el error del año de siembra.",
+   "Muestra aleatoria simple de 20.000 píxeles de 30 m, intervalos por bootstrap (2.000 remuestreos). El cálculo sobre toda el área cae dentro de los intervalos.",
+   "Ninguno de los dos productos es la verdad. El año de siembra corresponde a la última rotación: una palma vieja resembrada puede parecer bosque para Hansen.",
+   "TMF solo cubre bosque húmedo tropical. La palma sobre bosque seco del Caribe no puede contar como bosque para TMF; por eso las cifras se dan por departamento.",
+   "No es una evaluación del reglamento europeo de deforestación (EUDR), cuya fecha de corte es el 31 de diciembre de 2020.",
+   "Solo se muestran celdas agregadas e imágenes satelitales: ni linderos de fincas, ni propietarios, ni empresas."],
+  footer:"Datos: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025, Landsat Colección 2. Procesado en Google Earth Engine. El preregistro, el código y las pruebas están en el repositorio."},
+ en:{brand:"Oil palm and forest · Colombia 2001–2018",
+  title:"How much Colombian oil palm replaced forest? It depends on the forest map.",
+  lede:"Oil palm planted from 2001 to 2018 in mainland Colombia, per the global palm map of Descals et al. (2024): {palm} ha. Share of that area that was forest before planting, according to the two most used global forest products.",
+  pctOf:"of the palm was forest", tagPre:"Preregistered", tagExp:"Exploratory",
+  verdictTxt:"The products disagree on {d} of the palm area (95 % CI {lo} to {hi}). The rule fixed before looking required at least 20 %, so the verdict is: the answer does not depend on the product.",
+  exploTxt:"Still, Hansen sees {r} times more converted forest than TMF. The rule measured pixel-level disagreement over all palm; with so little palm on forest, it could hardly reach 20 %. The rule is reported as written.",
+  mapH:"Where palm replaced forest", mapSub:"20 km cells with palm planted 2001 to 2018. Colour is palm that was forest, in hectares. Tap a cell for its numbers; the three outlined cells are the detail cells.",
+  disagreeBtn:"Disagreement", yearH:"By planting year", bandNote:"band: sample 95 % CI",
+  yearNote:"Not a trend. Neither product records loss before 2001: for palm planted in 2001 only 2001 to 2003 are visible, and forest cleared earlier does not count. Early years are low by construction.",
+  deptH:"By department (sample, n ≥ 100)",
+  detH:"Three cells up close, in the Middle Magdalena", detSub:"Chosen by a rule fixed before seeing the data: the two cells with the most palm on forest by both products, and the two with the largest disagreement. One cell is in both lists, so there are three.",
+  swipe:"Before / after", planted:"Planted up to", compareBtn:"Compare", offBtn:"No pixels",
+  falseColour:"Landsat false colour (SWIR, near infrared, red): vegetation shows green, young palm lighter and in a grid.",
+  palmF:"palm on forest", palmNF:"palm with no prior forest", hOnly:"only Hansen says forest", tOnly:"only TMF says forest", bothF:"both say forest",
+  fPalm:"Palm 2001–2018", fH:"Forest per Hansen", fT:"Forest per TMF", fD:"Disagreement",
+  centre:"Municipality at the cell centre: {m}. Composites from {a} and {b} scenes.",
+  howH:"How it was done, and what it does not say",
+  limits:["Forest per Hansen: tree cover of 30 % or more in 2000 and loss between 2001 and planting year + 2. Per TMF: undisturbed or degraded forest in 2000 and deforested in the same window. The 2-year margin covers planting-year error.",
+   "Simple random sample of 20,000 pixels of 30 m, bootstrap intervals (2,000 resamples). The wall-to-wall computation falls inside the intervals.",
+   "Neither product is the truth. Planting year is the last rotation: old palm replanted can look like forest to Hansen.",
+   "TMF covers tropical moist forest only. Palm on Caribbean dry forest cannot count as forest for TMF, which is why results are given by department.",
+   "This is not an assessment under the EU Deforestation Regulation (EUDR), whose cut-off date is 31 December 2020.",
+   "Only aggregated cells and satellite imagery are shown: no farm boundaries, owners or companies."],
+  footer:"Data: BIOPAMA Global Oil Palm v1.2 (Descals et al. 2024), Hansen GFC 2025 v1.13, JRC TMF v1 2025, Landsat Collection 2. Processed in Google Earth Engine. Preregistration, code and tests are in the repository."}
+};
+const TOWNS = {E4940_N2400:"San Alberto (Cesar)", E4900_N2360:"Puerto Wilches (Santander)", E4920_N2360:"Sabana de Torres (Santander)"};
+let L = "es", S, G, cur = null, mapMode = "hansen", pxMode = "hansen";
+const px = {};
+const $ = s => document.querySelector(s);
+const fmt = (v, d = 0) => new Intl.NumberFormat(L === "es" ? "es-CO" : "en-US", {minimumFractionDigits: d, maximumFractionDigits: d}).format(v);
+const pct = (v, d = 1) => L === "es" ? fmt(v * 100, d) + " %" : fmt(v * 100, d) + "%";
+const fill = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
+const NS = "http://www.w3.org/2000/svg";
+const el = (n, a = {}, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+
+function res(group, measure) { return S.results.find(r => r.group === group && r.threshold === 30 && r.measure === measure); }
+
+function text() {
+  document.documentElement.lang = L;
+  document.querySelectorAll("[data-i]").forEach(e => { const v = T[L][e.dataset.i]; if (typeof v === "string") e.textContent = v; });
+  $(".lede").textContent = fill(T[L].lede, {palm: fmt(S.wall_to_wall.palm_ha)});
+  const h = res("all", "hansen"), t = res("all", "tmf"), d = res("all", "disagree");
+  $("#nH").innerHTML = fmt(h.estimate * 100, 1) + "<small>%</small>"; $("#nT").innerHTML = fmt(t.estimate * 100, 1) + "<small>%</small>";
+  $("#ciH").textContent = T[L].pctOf + " · IC 95 % " + pct(h.lo95) + "–" + pct(h.hi95);
+  $("#ciT").textContent = T[L].pctOf + " · IC 95 % " + pct(t.lo95) + "–" + pct(t.hi95);
+  if (L === "en") { $("#ciH").textContent = $("#ciH").textContent.replace("IC", "CI"); $("#ciT").textContent = $("#ciT").textContent.replace("IC", "CI"); }
+  $("#verdict").textContent = fill(T[L].verdictTxt, {d: pct(d.estimate), lo: pct(d.lo95), hi: pct(d.hi95)});
+  $("#explo").textContent = fill(T[L].exploTxt, {r: fmt(h.estimate / t.estimate, 1)});
+  $("#limits").innerHTML = T[L].limits.map(x => "<li>" + x + "</li>").join("");
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === L));
+  drawMap(); drawYears(); drawDepts(); tabs(); facts(); legendPx();
+}
+
+/* ---------- national map ---------- */
+const K = Math.cos(4.5 * Math.PI / 180), X0 = -79.2, X1 = -66.8, Y0 = -4.3, Y1 = 12.6;
+const W = 600, H = Math.round(W * (Y1 - Y0) / ((X1 - X0) * K));
+const pj = ([x, y]) => [((x - X0) / (X1 - X0)) * W, ((Y1 - y) / (Y1 - Y0)) * H];
+function rings(g, out = []) {
+  if (g.type === "Polygon") out.push(...g.coordinates);
+  else if (g.type === "MultiPolygon") g.coordinates.forEach(p => out.push(...p));
+  else if (g.type === "GeometryCollection") g.geometries.forEach(x => rings(x, out));
+  return out;
+}
+const pathOf = rs => rs.map(r => "M" + r.map(p => pj(p).map(v => v.toFixed(1)).join(",")).join("L") + "Z").join("");
+function ramp(mode, v, max) {
+  const c = mode === "hansen" ? [227, 163, 59] : mode === "tmf" ? [86, 184, 196] : [243, 234, 210];
+  const a = Math.sqrt(Math.min(v / max, 1));
+  return `rgba(${c[0]},${c[1]},${c[2]},${(0.12 + 0.88 * a).toFixed(3)})`;
+}
+function drawMap() {
+  const s = $("#map"); s.innerHTML = ""; s.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  el("path", {d: pathOf(rings(G.outline)), fill: "#1b2621", stroke: "#3a4a42", "stroke-width": 0.8}, s);
+  const max = Math.max(...G.cells.map(c => c[mapMode]));
+  G.cells.forEach(c => {
+    const p = el("path", {d: pathOf([c.ring]), class: "cell", fill: c[mapMode] > 0 ? ramp(mapMode, c[mapMode], max) : "rgba(125,138,92,.35)", tabindex: 0}, s);
+    const show = () => { $("#tip").innerHTML = `<b>${c.id}</b> · ${T[L].fPalm}: <b>${fmt(c.palm)} ha</b> · Hansen <b>${fmt(c.hansen)} ha</b> · TMF <b>${fmt(c.tmf)} ha</b> · ${T[L].fD}: <b>${fmt(c.disagree)} ha</b>`; };
+    p.addEventListener("mouseenter", show); p.addEventListener("focus", show);
+    p.addEventListener("click", () => { if (S.cells[c.id]) { select(c.id); $("#detail").scrollIntoView({behavior: "smooth"}); } else show(); });
+  });
+  Object.keys(S.cells).forEach(id => { const c = G.cells.find(x => x.id === id); el("path", {d: pathOf([c.ring]), class: "pick"}, s); });
+  const lab = mapMode === "disagree" ? T[L].fD : mapMode === "hansen" ? T[L].fH : T[L].fT;
+  const grad = mapMode === "hansen" ? "#e3a33b" : mapMode === "tmf" ? "#56b8c4" : "#f3ead2";
+  $("#mapLegend").innerHTML = `<span>${lab}: 0<i class="ramp" style="background:linear-gradient(90deg,transparent,${grad})"></i>${fmt(max)} ha</span><span><i class="sw" style="background:rgba(125,138,92,.5)"></i>${T[L].palmNF}</span>`;
+}
+
+/* ---------- year chart ---------- */
+function drawYears() {
+  const s = $("#years"); s.innerHTML = ""; const Y = S.by_year, m = {l: 44, r: 12, t: 12, b: 28}, w = 520 - m.l - m.r, h = 260 - m.t - m.b;
+  const top = Math.ceil(Math.max(...Y.map(d => d.hansen_hi)) * 10) / 10;
+  const x = yr => m.l + (yr - 2001) / 17 * w, y = v => m.t + h - v / top * h;
+  for (let v = 0; v <= top + 1e-9; v += 0.1) { el("line", {x1: m.l, x2: m.l + w, y1: y(v), y2: y(v), stroke: "#2a3832"}, s); el("text", {x: m.l - 8, y: y(v) + 4, "text-anchor": "end"}, s).textContent = pct(v, 0); }
+  [2001, 2005, 2010, 2015, 2018].forEach(yr => { el("text", {x: x(yr), y: 260 - 8, "text-anchor": "middle"}, s).textContent = yr; });
+  [["hansen", "#e3a33b"], ["tmf", "#56b8c4"]].forEach(([k, c]) => {
+    const band = Y.map(d => [x(d.year), y(d[k + "_hi"])]).concat(Y.slice().reverse().map(d => [x(d.year), y(d[k + "_lo"])]));
+    el("path", {d: "M" + band.map(p => p.join(",")).join("L") + "Z", fill: c, "fill-opacity": .18}, s);
+    el("path", {d: "M" + Y.map(d => [x(d.year), y(d[k])].join(",")).join("L"), fill: "none", stroke: c, "stroke-width": 2.2}, s);
+    const e = Y[Y.length - 1]; el("circle", {cx: x(e.year), cy: y(e[k]), r: 3.5, fill: c}, s);
+  });
+}
+
+/* ---------- department dumbbell ---------- */
+function drawDepts() {
+  const s = $("#depts"); s.innerHTML = ""; const D = S.departments.slice().sort((a, b) => b.hansen - a.hansen);
+  const m = {l: 132, r: 16, t: 8, b: 22}, w = 520 - m.l - m.r, rowH = (330 - m.t - m.b) / D.length;
+  const top = Math.ceil(Math.max(...D.map(d => Math.max(d.hansen, d.tmf))) * 10) / 10, x = v => m.l + v / top * w;
+  for (let v = 0; v <= top + 1e-9; v += 0.1) { el("line", {x1: x(v), x2: x(v), y1: m.t, y2: 330 - m.b, stroke: "#2a3832"}, s); el("text", {x: x(v), y: 330 - 6, "text-anchor": "middle"}, s).textContent = pct(v, 0); }
+  D.forEach((d, i) => {
+    const cy = m.t + rowH * (i + .5);
+    el("text", {x: m.l - 10, y: cy + 4, "text-anchor": "end", style: "fill:#e9ede6"}, s).textContent = d.department.replace("Norte De", "Norte de");
+    el("line", {x1: x(d.hansen), x2: x(d.tmf), y1: cy, y2: cy, stroke: "#5f6f66", "stroke-width": 2}, s);
+    el("circle", {cx: x(d.tmf), cy, r: 5, fill: "#56b8c4"}, s); el("circle", {cx: x(d.hansen), cy, r: 5, fill: "#e3a33b"}, s);
+    el("title", {}, el("g", {}, s)).textContent = `${d.department}: Hansen ${pct(d.hansen)}, TMF ${pct(d.tmf)}, n=${d.n}`;
+  });
+}
+
+/* ---------- detail cells ---------- */
+function tabs() {
+  const order = Object.keys(S.cells);
+  $("#tabs").innerHTML = order.map(id => `<button data-id="${id}" aria-pressed="${id === cur}">${TOWNS[id]}<small>${id}</small></button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach(b => b.onclick = () => select(b.dataset.id));
+}
+function facts() {
+  if (!cur) return; const c = S.cells[cur];
+  const items = [[T[L].fPalm, c.palm_ha, ""], [T[L].fH, c.hansen_ha, "h"], [T[L].fT, c.tmf_ha, "t"], [T[L].fD, c.disagree_ha, ""]];
+  $("#facts").innerHTML = items.map(([k, v, cl]) => `<div><dt>${k}</dt><dd class="${cl}">${fmt(v)} ha</dd></div>`).join("");
+  $("#cellNote").textContent = fill(T[L].centre, {m: TOWNS[cur], a: c.scenes_2000, b: c.scenes_2023});
+}
+function legendPx() {
+  const sw = (c, t) => `<span><i class="sw" style="background:${c}"></i>${t}</span>`;
+  $("#pxLegend").innerHTML = pxMode === "off" ? "" : pxMode === "disagree"
+    ? sw("#e3a33b", T[L].hOnly) + sw("#56b8c4", T[L].tOnly) + sw("#f3ead2", T[L].bothF) + sw("rgba(233,237,230,.45)", T[L].palmNF)
+    : sw(pxMode === "hansen" ? "#e3a33b" : "#56b8c4", T[L].palmF) + sw("rgba(233,237,230,.45)", T[L].palmNF);
+}
+function loadPx(id) {
+  if (px[id]) return Promise.resolve(px[id]);
+  return new Promise((ok, bad) => {
+    const im = new Image(); im.onload = () => {
+      const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
+      const x = c.getContext("2d", {willReadFrequently: true}); x.drawImage(im, 0, 0);
+      px[id] = {w: im.width, h: im.height, d: x.getImageData(0, 0, im.width, im.height).data}; ok(px[id]);
+    }; im.onerror = bad; im.src = `data/cell_${id}.png`;
+  });
+}
+function paint() {
+  const P = px[cur], cv = $("#px"); if (!P) return;
+  cv.width = P.w; cv.height = P.h; const x = cv.getContext("2d"), out = x.createImageData(P.w, P.h), o = out.data, d = P.d;
+  const Y = +$("#year").value - 2000;
+  if (pxMode !== "off") for (let i = 0; i < d.length; i += 4) {
+    const yr = d[i]; if (!yr || yr > Y) continue;
+    const g = d[i + 1], hF = g & 1, tF = g & 2; let c;
+    if (pxMode === "hansen") c = hF ? [227, 163, 59, 255] : [233, 237, 230, 120];
+    else if (pxMode === "tmf") c = tF ? [86, 184, 196, 255] : [233, 237, 230, 120];
+    else c = hF && tF ? [243, 234, 210, 255] : hF ? [227, 163, 59, 255] : tF ? [86, 184, 196, 255] : [233, 237, 230, 100];
+    o[i] = c[0]; o[i + 1] = c[1]; o[i + 2] = c[2]; o[i + 3] = c[3];
+  }
+  x.putImageData(out, 0, 0);
+}
+async function select(id) {
+  cur = id; const c = S.cells[id];
+  $("#before").src = `data/cell_${id}_2000.jpg`; $("#after").src = `data/cell_${id}_2023.jpg`;
+  $("#before").alt = "Landsat 1999-2001, " + TOWNS[id]; $("#after").alt = "Landsat 2022-2024, " + TOWNS[id];
+  const [x0, y0, x1, y1] = c.box, ring = G.cells.find(g => g.id === id).ring;
+  const o = $("#outline"); o.innerHTML = "";
+  el("polygon", {points: ring.map(([x, y]) => [(x - x0) / (x1 - x0), (y1 - y) / (y1 - y0)].join(",")).join(" "), fill: "none", stroke: "#f3ead2", "stroke-width": 2, "vector-effect": "non-scaling-stroke", "stroke-dasharray": "6 5"}, o);
+  tabs(); facts(); await loadPx(id); paint();
+}
+function setSwipe(v) { $("#after").style.clipPath = `inset(0 0 0 ${v}%)`; $("#divider").style.left = v + "%"; $("#swipeV").textContent = v + "%"; }
+
+function seg(sel, fn) { document.querySelectorAll(sel + " button").forEach(b => b.onclick = () => { document.querySelectorAll(sel + " button").forEach(x => x.setAttribute("aria-pressed", x === b)); fn(b.dataset.m); }); }
+
+Promise.all([fetch("data/summary.json").then(r => r.json()), fetch("data/grid.json").then(r => r.json())]).then(([s, g]) => {
+  S = s; G = g;
+  document.querySelectorAll(".lang button").forEach(b => b.onclick = () => { L = b.dataset.lang; text(); });
+  seg("#mapMode", m => { mapMode = m; drawMap(); });
+  seg("#pxMode", m => { pxMode = m; legendPx(); paint(); });
+  $("#year").oninput = e => { $("#yearV").textContent = e.target.value; paint(); }; $("#yearV").textContent = $("#year").value;
+  $("#swipe").oninput = e => setSwipe(e.target.value); setSwipe(50);
+  const stage = $("#stage"); let drag = false;
+  const mv = e => { if (!drag) return; const r = stage.getBoundingClientRect(); const v = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 100); $("#swipe").value = v; setSwipe(v); };
+  stage.addEventListener("pointerdown", e => { drag = true; stage.setPointerCapture(e.pointerId); mv(e); });
+  stage.addEventListener("pointermove", mv); stage.addEventListener("pointerup", () => drag = false);
+  cur = Object.keys(S.cells)[0]; text(); select(cur);
+});
+</script>
+</body>
+</html>
