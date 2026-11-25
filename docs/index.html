@@ -145,7 +145,7 @@ footer{padding:48px 0 60px;color:var(--faint);font-size:14px}
       <div class="controls">
         <label class="row"><span data-i="swipe"></span><input type="range" id="swipe" min="0" max="100" value="50"><span id="swipeV"></span></label>
         <label class="row"><span data-i="planted"></span><input type="range" id="year" min="2001" max="2018" value="2018"><span id="yearV"></span></label>
-        <div class="seg" role="group" id="pxMode" style="margin:0">
+        <div class="seg" role="group" id="pxMode" style="margin:0;justify-self:start">
           <button data-m="hansen" aria-pressed="true">Hansen</button><button data-m="tmf" aria-pressed="false">TMF</button><button data-m="disagree" aria-pressed="false" data-i="compareBtn"></button><button data-m="off" aria-pressed="false" data-i="offBtn"></button>
         </div>
         <div class="legend" id="pxLegend"></div>
@@ -182,7 +182,7 @@ const T = {
   detH:"Tres celdas de cerca, en el Magdalena Medio", detSub:"Elegidas por una regla fijada antes de ver los datos: las dos celdas con más palma sobre bosque según ambos productos y las dos con mayor desacuerdo. Una celda está en las dos listas, por eso son tres.",
   swipe:"Antes / después", planted:"Sembrada hasta", compareBtn:"Comparar", offBtn:"Sin píxeles",
   falseColour:"Falso color Landsat (SWIR, infrarrojo cercano, rojo): la vegetación sale verde y la palma joven, más clara y en retícula.",
-  palmF:"palma sobre bosque", palmNF:"palma sin bosque previo", hOnly:"solo Hansen dice bosque", tOnly:"solo TMF dice bosque", bothF:"los dos dicen bosque",
+  palmF:"palma sobre bosque", palmNF:"palma sin bosque previo", noDis:"palma sin desacuerdo", hOnly:"solo Hansen dice bosque", tOnly:"solo TMF dice bosque", bothF:"los dos dicen bosque",
   fPalm:"Palma 2001–2018", fH:"Bosque según Hansen", fT:"Bosque según TMF", fD:"Desacuerdo",
   centre:"Municipio en el centro de la celda: {m}. Composiciones con {a} y {b} escenas.",
   howH:"Cómo se hizo y qué no dice",
@@ -197,20 +197,20 @@ const T = {
   title:"How much Colombian oil palm replaced forest? It depends on the forest map.",
   lede:"Oil palm planted from 2001 to 2018 in mainland Colombia, per the global palm map of Descals et al. (2024): {palm} ha. Share of that area that was forest before planting, according to the two most used global forest products.",
   pctOf:"of the palm was forest", tagPre:"Preregistered", tagExp:"Exploratory",
-  verdictTxt:"The products disagree on {d} of the palm area (95 % CI {lo} to {hi}). The rule fixed before looking required at least 20 %, so the verdict is: the answer does not depend on the product.",
-  exploTxt:"Still, Hansen sees {r} times more converted forest than TMF. The rule measured pixel-level disagreement over all palm; with so little palm on forest, it could hardly reach 20 %. The rule is reported as written.",
+  verdictTxt:"The products disagree on {d} of the palm area (95% CI {lo} to {hi}). The rule fixed before looking required at least 20%, so the verdict is: the answer does not depend on the product.",
+  exploTxt:"Still, Hansen sees {r} times more converted forest than TMF. The rule measured pixel-level disagreement over all palm; with so little palm on forest, it could hardly reach 20%. The rule is reported as written.",
   mapH:"Where palm replaced forest", mapSub:"20 km cells with palm planted 2001 to 2018. Colour is palm that was forest, in hectares. Tap a cell for its numbers; the three outlined cells are the detail cells.",
-  disagreeBtn:"Disagreement", yearH:"By planting year", bandNote:"band: sample 95 % CI",
+  disagreeBtn:"Disagreement", yearH:"By planting year", bandNote:"band: sample 95% CI",
   yearNote:"Not a trend. Neither product records loss before 2001: for palm planted in 2001 only 2001 to 2003 are visible, and forest cleared earlier does not count. Early years are low by construction.",
   deptH:"By department (sample, n ≥ 100)",
   detH:"Three cells up close, in the Middle Magdalena", detSub:"Chosen by a rule fixed before seeing the data: the two cells with the most palm on forest by both products, and the two with the largest disagreement. One cell is in both lists, so there are three.",
   swipe:"Before / after", planted:"Planted up to", compareBtn:"Compare", offBtn:"No pixels",
   falseColour:"Landsat false colour (SWIR, near infrared, red): vegetation shows green, young palm lighter and in a grid.",
-  palmF:"palm on forest", palmNF:"palm with no prior forest", hOnly:"only Hansen says forest", tOnly:"only TMF says forest", bothF:"both say forest",
+  palmF:"palm on forest", palmNF:"palm with no prior forest", noDis:"palm with no disagreement", hOnly:"only Hansen says forest", tOnly:"only TMF says forest", bothF:"both say forest",
   fPalm:"Palm 2001–2018", fH:"Forest per Hansen", fT:"Forest per TMF", fD:"Disagreement",
   centre:"Municipality at the cell centre: {m}. Composites from {a} and {b} scenes.",
   howH:"How it was done, and what it does not say",
-  limits:["Forest per Hansen: tree cover of 30 % or more in 2000 and loss between 2001 and planting year + 2. Per TMF: undisturbed or degraded forest in 2000 and deforested in the same window. The 2-year margin covers planting-year error.",
+  limits:["Forest per Hansen: tree cover of 30% or more in 2000 and loss between 2001 and planting year + 2. Per TMF: undisturbed or degraded forest in 2000 and deforested in the same window. The 2-year margin covers planting-year error.",
    "Simple random sample of 20,000 pixels of 30 m, bootstrap intervals (2,000 resamples). The wall-to-wall computation falls inside the intervals.",
    "Neither product is the truth. Planting year is the last rotation: old palm replanted can look like forest to Hansen.",
    "TMF covers tropical moist forest only. Palm on Caribbean dry forest cannot count as forest for TMF, which is why results are given by department.",
@@ -236,9 +236,9 @@ function text() {
   $(".lede").textContent = fill(T[L].lede, {palm: fmt(S.wall_to_wall.palm_ha)});
   const h = res("all", "hansen"), t = res("all", "tmf"), d = res("all", "disagree");
   $("#nH").innerHTML = fmt(h.estimate * 100, 1) + "<small>%</small>"; $("#nT").innerHTML = fmt(t.estimate * 100, 1) + "<small>%</small>";
-  $("#ciH").textContent = T[L].pctOf + " · IC 95 % " + pct(h.lo95) + "–" + pct(h.hi95);
-  $("#ciT").textContent = T[L].pctOf + " · IC 95 % " + pct(t.lo95) + "–" + pct(t.hi95);
-  if (L === "en") { $("#ciH").textContent = $("#ciH").textContent.replace("IC", "CI"); $("#ciT").textContent = $("#ciT").textContent.replace("IC", "CI"); }
+  const ci = L === "es" ? " · IC 95 % " : " · 95% CI ";
+  $("#ciH").textContent = T[L].pctOf + ci + pct(h.lo95) + "–" + pct(h.hi95);
+  $("#ciT").textContent = T[L].pctOf + ci + pct(t.lo95) + "–" + pct(t.hi95);
   $("#verdict").textContent = fill(T[L].verdictTxt, {d: pct(d.estimate), lo: pct(d.lo95), hi: pct(d.hi95)});
   $("#explo").textContent = fill(T[L].exploTxt, {r: fmt(h.estimate / t.estimate, 1)});
   $("#limits").innerHTML = T[L].limits.map(x => "<li>" + x + "</li>").join("");
@@ -275,7 +275,7 @@ function drawMap() {
   Object.keys(S.cells).forEach(id => { const c = G.cells.find(x => x.id === id); el("path", {d: pathOf([c.ring]), class: "pick"}, s); });
   const lab = mapMode === "disagree" ? T[L].fD : mapMode === "hansen" ? T[L].fH : T[L].fT;
   const grad = mapMode === "hansen" ? "#e3a33b" : mapMode === "tmf" ? "#56b8c4" : "#f3ead2";
-  $("#mapLegend").innerHTML = `<span>${lab}: 0<i class="ramp" style="background:linear-gradient(90deg,transparent,${grad})"></i>${fmt(max)} ha</span><span><i class="sw" style="background:rgba(125,138,92,.5)"></i>${T[L].palmNF}</span>`;
+  $("#mapLegend").innerHTML = `<span>${lab}: 0<i class="ramp" style="background:linear-gradient(90deg,transparent,${grad})"></i>${fmt(max)} ha</span><span><i class="sw" style="background:rgba(125,138,92,.5)"></i>${mapMode === "disagree" ? T[L].noDis : T[L].palmNF}</span>`;
 }
 
 /* ---------- year chart ---------- */
